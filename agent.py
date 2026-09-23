@@ -21,9 +21,14 @@ class Agent:
                  .sort_values("n", ascending=False))
 
         # 2. ГЕНЕРАЦИЯ ГИПОТЕЗ (Пока базовая, позже подключим LLM)
+        tariff_codes = list(env.tariffs["tariff_plan_code"])
+        tariff_prices = env.tariffs.set_index("tariff_plan_code")["price_tariff"]
+        preferred_targets = sorted(tariff_codes, key=lambda code: tariff_prices[code], reverse=True)
+
         candidates = []
         for _, cell in cells.head(4).iterrows():
-            for target in ["tariff_8", "tariff_9"]:
+            targets = [target for target in preferred_targets if target != cell.current_tariff][:2]
+            for target in targets:
                 if target == cell.current_tariff:
                     continue
                 candidates.append((cell.current_tariff, cell.arpu_segment, target))

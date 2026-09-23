@@ -3,6 +3,7 @@ import pandas as pd
 import os
 import time
 from dotenv import load_dotenv
+from mock_environment import make_mock_env
 
 # Загружаем класс Agent из нашего файла agent.py
 from agent import Agent 
@@ -35,20 +36,6 @@ st.divider()
 
 st.subheader("2. Запуск разведки и генерация кампаний")
 
-# Создаем заглушку среды для локального тестирования интерфейса
-class MockEnv:
-    def __init__(self, profile):
-        self.customer_profile = profile
-        self.remaining_budget = 100000
-        self.pilots_left = 20
-        # Заглушка: искусственно создаем список тарифов, чтобы код не падал
-        self.tariffs = pd.DataFrame({"tariff_plan_code": [f"tariff_{i}" for i in range(1, 22)]})
-
-    def run_pilot(self, target_tariff, channel, n_customers, filter_arpu_segment=None, filter_current_tariff=None):
-        # Эмуляция: каждый пилот "успешен" и дает случайный небольшой прирост (для теста)
-        import random
-        return {"observed_lift_ratio": random.uniform(-0.1, 0.3)}
-
 if st.button("🚀 Запустить автономного агента", type="primary"):
     if df_profile is None:
         st.error("Нет данных для анализа. Сначала загрузите customer_profile.csv")
@@ -58,7 +45,7 @@ if st.button("🚀 Запустить автономного агента", type
             time.sleep(1) # Имитация работы
             
             my_agent = Agent()
-            mock_env = MockEnv(df_profile)
+            mock_env, _ = make_mock_env(seed=42)
             
             st.write("🧪 Запуск тестовых пилотов (Exploration)...")
             # Запускаем реальный метод act() из файла agent.py
