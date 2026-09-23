@@ -53,7 +53,7 @@ class Agent:
         # Отбираем только то, что принесло прибыль (ratio > 0)
         best = pd.DataFrame(observed).sort_values("ratio", ascending=False)
         campaigns = []
-        for _, row in best.head(10).iterrows(): # Максимум 10 кампаний по правилам
+        for _, row in best.head(10).iterrows(): # Максимум 10 кампаний
             if row["ratio"] <= 0:
                 continue
             campaigns.append({
